@@ -12,7 +12,7 @@ public class Customer {
     private String lastName;
     private String email;
 
-    public Customer(String firstName, String lastName, String email) {
+    public Customer(String email, String firstName, String lastName) {
         if (!isValidEmail(email)) {
         throw new IllegalArgumentException("Invalid email");}
         this.firstName = firstName;

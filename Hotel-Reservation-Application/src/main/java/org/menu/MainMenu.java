@@ -2,6 +2,7 @@ package org.menu;
 
 
 import org.api.HotelResource;
+import org.service.CustomerService;
 
 import java.util.Date;
 import java.text.ParseException;
@@ -9,13 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class MainMenu {
-    private HotelResource hotelResource;
+    private final HotelResource hotelResource = HotelResource.getHotelResource();
+    private final CustomerService customerService = CustomerService.getCustomerService();
     private Scanner scanner;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-
-    public MainMenu(HotelResource hotelResource) {
-        this.hotelResource = hotelResource;
-    }
     public MainMenu() {}
 
     public void printMenuItems() {
@@ -58,10 +56,29 @@ public class MainMenu {
     }
 
     void findAndReserveARoom() throws ParseException {
-        System.out.println("Check-in date (yyyy/MM/dd): ");
-        var checkIn = sdf.parse(scanner.nextLine());
-        System.out.println("Check-out date (yyyy/MM/dd): ");
-        var checkOut = sdf.parse(scanner.nextLine());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        Date checkIn = null;
+        Date checkOut = null;
+
+        boolean validDate = false;
+
+        while (!validDate) {
+            try {
+                System.out.println("Check-in date (yyyy/MM/dd): ");
+                checkIn = sdf.parse(scanner.nextLine());
+
+                System.out.println("Check-out date (yyyy/MM/dd): ");
+                checkOut = sdf.parse(scanner.nextLine());
+
+                if (checkIn.before(checkOut)) {
+                    validDate = true;
+                } else {
+                    System.out.println("Invalid dates. Check-in date must be before check-out date.");
+                }
+            } catch (java.text.ParseException e) {
+                System.out.println("Invalid date format. Please enter dates in yyyy/MM/dd format.");
+            }
+        }
 
         var availableRooms = hotelResource.findARoom((Date) checkIn, (Date) checkOut);
         if (availableRooms.isEmpty()) {
@@ -103,11 +120,17 @@ public class MainMenu {
 
     void createAccount() {
         System.out.println("First name: ");
-        var fn = scanner.nextLine();
+        String fn = scanner.nextLine();
         System.out.println("Last name: ");
-        var ln = scanner.nextLine();
+        String ln = scanner.nextLine();
         System.out.println("Enter your email: eg. name@domain.com");
-        var email = scanner.nextLine();
+        String email = scanner.nextLine();
+        var customerExist = customerService.getCustomer(email);
+        while(customerExist != null) {
+            System.out.println("Email existed. Please choose another email!");
+            email = scanner.nextLine();
+            customerExist = customerService.getCustomer(email);
+        }
         try {
             hotelResource.createACustomer(email, fn, ln);
         } catch (IllegalArgumentException e) {

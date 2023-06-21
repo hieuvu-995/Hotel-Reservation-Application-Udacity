@@ -7,8 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CustomerService {
-    private static Map<String, Customer> customers = new HashMap<>();
 
+    private static CustomerService customerService;
+    private static final Map<String, Customer> customers = new HashMap<>();
+
+    public CustomerService() {}
+    public static CustomerService getCustomerService() {
+        if (customerService == null) {
+            customerService = new CustomerService();
+        }
+        return customerService;
+    }
     public void addCustomer(String email, String firstName, String lastName) {
         Customer customer = new Customer(email, firstName, lastName);
         customers.put(email, customer);
@@ -20,9 +29,5 @@ public class CustomerService {
 
     public Collection<Customer> getAllCustomers() {
         return customers.values();
-    }
-
-    public static Map<String, Customer> getCustomers() {
-        return customers;
     }
 }

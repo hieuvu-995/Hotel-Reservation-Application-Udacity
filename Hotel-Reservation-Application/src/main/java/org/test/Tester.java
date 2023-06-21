@@ -1,4 +1,6 @@
-package org.model;
+package org.test;
+
+import org.model.Customer;
 
 public class Tester {
     public static void main(String[] args) {

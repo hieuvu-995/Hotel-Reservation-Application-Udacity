@@ -10,6 +10,7 @@ import java.util.List;
 
 public class AdminResource {
 
+    private static AdminResource adminResource;
     private final CustomerService customerService;
     private final ReservationService reservationService;
     private AdminResource(CustomerService customerService, ReservationService reservationService) {
@@ -17,7 +18,12 @@ public class AdminResource {
         this.reservationService = reservationService;
     }
 
-
+    public static AdminResource getAdminResource() {
+        if (adminResource == null) {
+            adminResource = new AdminResource(CustomerService.getCustomerService(), ReservationService.getReservationService());
+        }
+        return adminResource;
+    }
     public Customer getCustomer(String email) {
         return customerService.getCustomer(email);
     }

@@ -11,11 +11,26 @@ import java.util.stream.Collectors;
 
 public class ReservationService {
 
+    private static ReservationService reservationService;
     private static Collection<IRoom> rooms = new ArrayList<IRoom>();
     private static Collection<Reservation> reservations = new ArrayList<>();
 
+    public static ReservationService getReservationService() {
+        if (reservationService == null) {
+            reservationService = new ReservationService();
+        }
+        return reservationService;
+    }
+
     public void addRoom(IRoom room) {
         rooms.add(room);
+    }
+
+    public IRoom getARoom(String roomId) {
+        return rooms.stream()
+                .filter(r -> r.getRoomNumber().equals(roomId))
+                .findFirst()
+                .orElse(null);
     }
 
     public Reservation reserveRoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
@@ -24,14 +39,6 @@ public class ReservationService {
         return reservation;
     }
 
-    public IRoom getARoom(String roomId) {
-        for (IRoom room : rooms) {
-            if (room.getRoomNumber().equals(roomId)) {
-                return room;
-            }
-        }
-        return null;
-    }
 
     public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
         Set<String> occupiedRoomNumbers = reservations.stream()
@@ -63,10 +70,6 @@ public class ReservationService {
     public static Collection<IRoom> getRooms() {
         return Collections.unmodifiableCollection(rooms);
     }
-
-    public static Collection<Reservation> getReservations() {
-        return Collections.unmodifiableCollection(reservations);
-    }
     public Collection<IRoom> getRecommendedRooms(Date originCheckIn, Date originCheckOut) {
         var c = Calendar.getInstance();
         c.setTime(originCheckIn);
@@ -75,7 +78,7 @@ public class ReservationService {
         c.setTime(originCheckOut);
         c.add(Calendar.DATE, 7);
         var checkOut = c.getTime();
-        return findRooms((Date) checkIn, (Date) checkOut);
+        return findRooms(checkIn,checkOut);
     }
 
 }

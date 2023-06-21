@@ -3,18 +3,17 @@ package org.menu;
 import org.api.AdminResource;
 import org.enums.RoomType;
 import org.model.Room;
+import org.service.ReservationService;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class AdminMenu {
 
-    private AdminResource adminResource;
+    private final AdminResource adminResource = AdminResource.getAdminResource();
+    private final ReservationService reservationService = ReservationService.getReservationService();
     private Scanner scanner;
 
-    public AdminMenu(AdminResource adminResource) {
-        this.adminResource = adminResource;
-    }
 
     public AdminMenu() {}
 
@@ -55,16 +54,32 @@ public class AdminMenu {
 
     private void addARoom() {
         Room room = new Room();
+        boolean validPrice = false;
         System.out.print("Room number: ");
-        room.setRoomNumber(scanner.nextLine());
+        String roomNumber = scanner.nextLine();
+        var roomExist = reservationService.getARoom(roomNumber);
+        while (roomExist != null) {
+            System.out.println("Room number already exists. Please enter a different room number: ");
+            roomNumber = scanner.nextLine();
+            roomExist = reservationService.getARoom(roomNumber);
+        }
+        room.setRoomNumber(roomNumber);
         System.out.print("Room type (S/D): ");
         if (scanner.nextLine().equalsIgnoreCase("S")) {
             room.setRoomType(RoomType.SINGLE);
         } else {
             room.setRoomType(RoomType.DOUBLE);
         }
-        System.out.print("Room price: ");
-        room.setPrice(Double.parseDouble(scanner.nextLine()));
+        while (!validPrice) {
+            System.out.print("Room price: ");
+
+            try {
+                room.setPrice(Double.parseDouble(scanner.nextLine()));
+                validPrice = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid room price. Please enter a valid price value.");
+            }
+        }
         adminResource.addRoom(List.of(room));
     }
 

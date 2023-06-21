@@ -11,6 +11,7 @@ import java.util.Collection;
 
 public class HotelResource {
 
+    private static HotelResource hotelResource;
     private final CustomerService customerService;
     private final ReservationService reservationService;
 
@@ -19,8 +20,15 @@ public class HotelResource {
         this.reservationService = reservationService;
     }
 
-    public Customer getCustomer(String customerEmail) {
-        return customerService.getCustomer(customerEmail);
+    public static HotelResource getHotelResource() {
+        if (hotelResource == null) {
+            hotelResource = new HotelResource(CustomerService.getCustomerService(), ReservationService.getReservationService());
+        }
+        return hotelResource;
+    }
+
+    public Customer getCustomer(String email) {
+        return customerService.getCustomer(email);
     }
 
     public void createACustomer(String email, String firstName, String lastName) {
@@ -31,19 +39,16 @@ public class HotelResource {
         return reservationService.getARoom(roomNumber);
     }
 
-    public Reservation bookARoom(String email, IRoom room, Date checkInDate, Date checkOutDate) {
+    public Reservation bookARoom(String email, IRoom room, Date checkInDate, Date checkOutDate) throws Exception {
         Customer customer = customerService.getCustomer(email);
         if (customer == null) {
-            throw new IllegalArgumentException("Customer not found");
+            throw new Exception("Customer not found! Please create new account before reserve.");
         }
         return reservationService.reserveRoom(customer, room, checkInDate, checkOutDate);
     }
 
     public Collection<Reservation> getCustomerReservations(String customerEmail) {
         Customer customer = customerService.getCustomer(customerEmail);
-        if (customer == null) {
-            throw new IllegalArgumentException("Customer not found");
-        }
         return reservationService.getCustomersReservation(customer);
     }
 
