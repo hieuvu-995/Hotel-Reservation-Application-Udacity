@@ -6,6 +6,7 @@ import org.model.Reservation;
 import org.service.CustomerService;
 import org.service.ReservationService;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Collection;
 
@@ -44,6 +45,10 @@ public class HotelResource {
         if (customer == null) {
             throw new Exception("Customer not found! Please create new account before reserve.");
         }
+        boolean duplicateReservation = reservationService.checkDuplicateReservation(checkInDate, checkOutDate, customer);
+        if (duplicateReservation) {
+            throw new Exception("Customer cannot reserve room in the same time");
+        }
         return reservationService.reserveRoom(customer, room, checkInDate, checkOutDate);
     }
 
@@ -58,6 +63,10 @@ public class HotelResource {
 
     public Collection<IRoom> getRecommendedRooms(Date originCheckIn, Date originCheckOut) {
         return reservationService.getRecommendedRooms(originCheckIn, originCheckOut);
+    }
+
+    public boolean getRoomNumCorrect(Collection<IRoom> availableRooms, String roomNum) {
+        return reservationService.checkRoomNumCorrect(availableRooms, roomNum);
     }
 }
 

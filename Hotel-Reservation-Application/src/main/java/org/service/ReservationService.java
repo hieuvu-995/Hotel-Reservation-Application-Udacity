@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 public class ReservationService {
 
     private static ReservationService reservationService;
-    private static Collection<IRoom> rooms = new ArrayList<IRoom>();
-    private static Collection<Reservation> reservations = new ArrayList<>();
+    private static final Collection<IRoom> rooms = new ArrayList<IRoom>();
+    private static final Collection<Reservation> reservations = new ArrayList<>();
 
     public static ReservationService getReservationService() {
         if (reservationService == null) {
@@ -51,6 +51,12 @@ public class ReservationService {
                 .filter(r -> !occupiedRoomNumbers.contains(r.getRoomNumber()))
                 .collect(Collectors.toList());
     }
+
+    public boolean checkDuplicateReservation(Date checkInDate, Date checkOutDate, Customer customer) {
+        return reservations.stream()
+                .anyMatch(r -> r.getCheckInDate().equals(checkInDate) && r.getCheckOutDate().equals(checkOutDate) && r.getCustomer().equals(customer));
+    }
+
     public Collection<Reservation> getCustomersReservation(Customer customer) {
         Collection<Reservation> customerReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
@@ -81,4 +87,7 @@ public class ReservationService {
         return findRooms(checkIn,checkOut);
     }
 
+    public boolean checkRoomNumCorrect(Collection<IRoom> availableRooms, String roomNum) {
+        return availableRooms.stream().anyMatch(r -> r.getRoomNumber().equals(roomNum));
+    }
 }

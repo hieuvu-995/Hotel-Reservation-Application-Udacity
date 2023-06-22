@@ -80,9 +80,9 @@ public class MainMenu {
             }
         }
 
-        var availableRooms = hotelResource.findARoom((Date) checkIn, (Date) checkOut);
+        var availableRooms = hotelResource.findARoom(checkIn, checkOut);
         if (availableRooms.isEmpty()) {
-            var recommendedRooms = hotelResource.getRecommendedRooms((Date) checkIn, (Date) checkOut);
+            var recommendedRooms = hotelResource.getRecommendedRooms(checkIn, checkOut);
             if (recommendedRooms.isEmpty()) {
                 System.out.println("Does not find any available rooms");
                 return;
@@ -95,10 +95,11 @@ public class MainMenu {
         }
         System.out.println("Available rooms:");
         availableRooms.forEach(System.out::println);
-
         System.out.println("Select room number: ");
-        var room = hotelResource.getRoom(scanner.nextLine());
-        if (room == null) {
+        String roomNum = scanner.nextLine();
+        var romNumExisted = hotelResource.getRoomNumCorrect(availableRooms, roomNum);
+        var room = hotelResource.getRoom(roomNum);
+        if (room == null || !romNumExisted) {
             System.out.println("Room number does not exist");
             return;
         }

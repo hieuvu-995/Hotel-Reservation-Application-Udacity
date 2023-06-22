@@ -19,10 +19,10 @@ public class Reservation {
         return checkOutDate;
     }
 
-    private Customer customer;
-    private IRoom iRoom;
-    private Date checkInDate;
-    private Date checkOutDate;
+    private final Customer customer;
+    private final IRoom iRoom;
+    private final Date checkInDate;
+    private final Date checkOutDate;
 
     public Reservation(Customer customer, IRoom iRoom, Date checkInDate, Date checkOutDate) {
         this.customer = customer;
